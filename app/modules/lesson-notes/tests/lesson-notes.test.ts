@@ -51,4 +51,16 @@ describe("describeNoteDraft", () => {
     expect(state.tooLong).toBe(true);
     expect(state.canSave).toBe(false);
   });
+
+  it("treats a draft as saved when it differs only by surrounding whitespace", () => {
+    const state = describeNoteDraft("hello \n", "hello");
+    expect(state.unsaved).toBe(false);
+    expect(state.canSave).toBe(false);
+  });
+
+  it("measures the limit on the trimmed draft, as the server does", () => {
+    const state = describeNoteDraft(`${"a".repeat(2000)}  `, null);
+    expect(state.tooLong).toBe(false);
+    expect(state.canSave).toBe(true);
+  });
 });

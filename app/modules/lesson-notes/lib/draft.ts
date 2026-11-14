@@ -14,10 +14,13 @@ export function noteDraftState(
   draft: string,
   savedBody: string | null
 ): NoteDraftState {
-  const length = draft.length;
+  // The server trims a note before it checks and stores it, so judge the
+  // draft by what would be saved.
+  const toSave = draft.trim();
+  const length = toSave.length;
   const tooLong = length > MAX_NOTE_LENGTH;
-  const empty = draft.trim().length === 0;
-  const unsaved = draft !== (savedBody ?? "");
+  const empty = length === 0;
+  const unsaved = toSave !== (savedBody ?? "");
 
   return {
     length,
