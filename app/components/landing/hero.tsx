@@ -1,9 +1,9 @@
 import { Link } from "react-router";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import type { LandingStat } from "~/modules/landing";
+import type { LandingCourse, LandingStat } from "~/modules/landing";
 import { SpotlightCard } from "./spotlight-card";
-import type { LandingCourse, LandingUser } from "./types";
+import type { LandingUser } from "./types";
 
 export function Hero({
   spotlight,

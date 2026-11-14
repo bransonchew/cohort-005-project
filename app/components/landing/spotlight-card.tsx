@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import { ArrowRight } from "lucide-react";
 import { CourseImage } from "~/components/course-image";
 import { CourseMeta } from "./course-meta";
-import type { LandingCourse } from "./types";
+import type { LandingCourse } from "~/modules/landing";
 
 export function SpotlightCard({ course }: { course: LandingCourse }) {
   return (

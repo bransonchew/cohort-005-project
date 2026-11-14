@@ -1,35 +1,94 @@
+import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { count, desc, eq, inArray } from "drizzle-orm";
+import * as schema from "~/db/schema";
+import { categories, courses, lessons, modules, users } from "~/db/schema";
+
+export type Db = BetterSQLite3Database<typeof schema>;
+
 export type LandingStat = { value: number; label: string };
 
-export type LandingHighlights<Course> = {
-  spotlight: Course | null;
-  featured: Course[];
+export type LandingCourse = {
+  id: number;
+  slug: string;
+  title: string;
+  description: string;
+  coverImageUrl: string | null;
+  instructorName: string;
+  lessonCount: number;
+};
+
+export type LandingHighlights = {
+  spotlight: LandingCourse | null;
+  featured: LandingCourse[];
   stats: LandingStat[];
 };
 
-export const FEATURED_COUNT = 3;
+const FEATURED_COUNT = 3;
 
-function countLabel(count: number, singular: string, plural: string) {
-  return count === 1 ? singular : plural;
+function countLabel(value: number, singular: string, plural: string) {
+  return value === 1 ? singular : plural;
 }
 
-export function pickHighlights<Course>(
-  newestFirst: Course[],
-  totalCourses: number,
-  totalCategories: number
-): LandingHighlights<Course> {
-  const [spotlight = null, ...rest] = newestFirst;
-  return {
-    spotlight,
-    featured: rest.slice(0, FEATURED_COUNT),
-    stats: [
-      {
-        value: totalCourses,
-        label: countLabel(totalCourses, "course", "courses"),
-      },
-      {
-        value: totalCategories,
-        label: countLabel(totalCategories, "category", "categories"),
-      },
-    ],
-  };
+function newestPublished(db: Db) {
+  return db
+    .select({
+      id: courses.id,
+      slug: courses.slug,
+      title: courses.title,
+      description: courses.description,
+      coverImageUrl: courses.coverImageUrl,
+      instructorName: users.name,
+    })
+    .from(courses)
+    .innerJoin(users, eq(courses.instructorId, users.id))
+    .where(eq(courses.status, schema.CourseStatus.Published))
+    .orderBy(desc(courses.createdAt), desc(courses.id))
+    .limit(FEATURED_COUNT + 1)
+    .all();
+}
+
+function lessonCounts(db: Db, courseIds: number[]) {
+  if (courseIds.length === 0) return new Map<number, number>();
+  const rows = db
+    .select({ courseId: modules.courseId, lessonCount: count(lessons.id) })
+    .from(lessons)
+    .innerJoin(modules, eq(lessons.moduleId, modules.id))
+    .where(inArray(modules.courseId, courseIds))
+    .groupBy(modules.courseId)
+    .all();
+  return new Map(rows.map((row) => [row.courseId, row.lessonCount]));
+}
+
+function catalogueStats(db: Db): LandingStat[] {
+  const totalCourses =
+    db
+      .select({ value: count() })
+      .from(courses)
+      .where(eq(courses.status, schema.CourseStatus.Published))
+      .get()?.value ?? 0;
+  const totalCategories =
+    db.select({ value: count() }).from(categories).get()?.value ?? 0;
+  return [
+    {
+      value: totalCourses,
+      label: countLabel(totalCourses, "course", "courses"),
+    },
+    {
+      value: totalCategories,
+      label: countLabel(totalCategories, "category", "categories"),
+    },
+  ];
+}
+
+export function getLandingHighlights(db: Db): LandingHighlights {
+  const newest = newestPublished(db);
+  const counts = lessonCounts(
+    db,
+    newest.map((course) => course.id)
+  );
+  const [spotlight = null, ...featured] = newest.map((course) => ({
+    ...course,
+    lessonCount: counts.get(course.id) ?? 0,
+  }));
+  return { spotlight, featured, stats: catalogueStats(db) };
 }

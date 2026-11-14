@@ -9,7 +9,7 @@ import {
 } from "~/components/ui/card";
 import { CourseImage } from "~/components/course-image";
 import { CourseMeta } from "./course-meta";
-import type { LandingCourse } from "./types";
+import type { LandingCourse } from "~/modules/landing";
 
 export function FeaturedCourses({ courses }: { courses: LandingCourse[] }) {
   return (
