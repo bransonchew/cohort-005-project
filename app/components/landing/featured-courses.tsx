@@ -21,7 +21,7 @@ export function FeaturedCourses({ courses }: { courses: LandingCourse[] }) {
               Featured Courses
             </h2>
             <p className="mt-2 text-muted-foreground">
-              Start learning with our most popular courses
+              More of the newest courses in the catalogue
             </p>
           </div>
           <Button asChild variant="outline">
