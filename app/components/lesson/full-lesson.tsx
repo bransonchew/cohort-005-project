@@ -20,7 +20,7 @@ import { YouTubePlayer } from "~/components/youtube-player";
 
 import { CurriculumSidebar } from "~/components/lesson/curriculum-sidebar";
 import { LessonNote } from "~/components/lesson/lesson-note";
-import { LessonBreadcrumb } from "~/components/lesson/locked-lesson";
+import { LessonBreadcrumb } from "~/components/lesson/lesson-breadcrumb";
 import { QuizSection } from "~/components/lesson/quiz-section";
 import { useAutoplay } from "~/components/lesson/use-autoplay";
 
