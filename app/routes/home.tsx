@@ -124,11 +124,11 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         </div>
       </header>
 
-      <Hero spotlight={spotlight} stats={stats} currentUser={currentUser} />
+      <Hero spotlight={spotlight} stats={stats} person={currentUser} />
 
       {featured.length > 0 && <FeaturedCourses courses={featured} />}
 
-      <LandingFooter currentUser={currentUser} />
+      <LandingFooter person={currentUser} />
 
       <DevUI
         users={users}

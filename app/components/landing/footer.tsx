@@ -1,10 +1,10 @@
 import { Link } from "react-router";
-import type { LandingUser } from "./types";
+import type { LandingPerson } from "./types";
 
 const linkClass =
   "text-muted-foreground transition-colors hover:text-foreground";
 
-export function LandingFooter({ currentUser }: { currentUser: LandingUser }) {
+export function LandingFooter({ person }: { person: LandingPerson }) {
   return (
     <footer className="border-t border-border">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-10 text-sm sm:flex-row sm:items-center sm:justify-between">
@@ -18,7 +18,7 @@ export function LandingFooter({ currentUser }: { currentUser: LandingUser }) {
           <Link to="/courses" className={linkClass}>
             Courses
           </Link>
-          {currentUser ? (
+          {person ? (
             <Link to="/dashboard" className={linkClass}>
               Dashboard
             </Link>
