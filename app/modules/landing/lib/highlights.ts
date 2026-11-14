@@ -48,7 +48,6 @@ function newestPublished(db: Db) {
 }
 
 function lessonCounts(db: Db, courseIds: number[]) {
-  if (courseIds.length === 0) return new Map<number, number>();
   const rows = db
     .select({ courseId: modules.courseId, lessonCount: count(lessons.id) })
     .from(lessons)
@@ -60,14 +59,15 @@ function lessonCounts(db: Db, courseIds: number[]) {
 }
 
 function catalogueStats(db: Db): LandingStat[] {
-  const totalCourses =
-    db
-      .select({ value: count() })
-      .from(courses)
-      .where(eq(courses.status, schema.CourseStatus.Published))
-      .get()?.value ?? 0;
-  const totalCategories =
-    db.select({ value: count() }).from(categories).get()?.value ?? 0;
+  const [{ value: totalCourses }] = db
+    .select({ value: count() })
+    .from(courses)
+    .where(eq(courses.status, schema.CourseStatus.Published))
+    .all();
+  const [{ value: totalCategories }] = db
+    .select({ value: count() })
+    .from(categories)
+    .all();
   return [
     {
       value: totalCourses,
